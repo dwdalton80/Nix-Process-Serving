@@ -1,6 +1,6 @@
 # Nix Process Serving — Enhancement Tasks
 
-- [ ] Synchronize the current Nix Process Serving website source to the connected GitHub repository.
+- [x] Synchronize the current Nix Process Serving website source to the connected GitHub repository.
 - [x] Add the official Nix Process Serving Facebook page to the contact details and footer.
 - [x] Add a client-focused About Ricky Nix section using the supplied professional biography.
 - [x] Add About navigation access in desktop and mobile navigation.
