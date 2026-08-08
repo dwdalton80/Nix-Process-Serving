@@ -3,40 +3,61 @@
 A licensed process server, skip tracer, court-filing service, and Oklahoma
 Notary Public serving Southern Oklahoma.
 
+**Live now:** [nixprocessserving.com](https://nixprocessserving.com) — the
+static site (`index.html`), hosted on GitHub Pages.
+
 ## What's in this repo
 
 - **`index.html`** — a static, self-contained build of *The Oklahoma Docket*
   design (editorial legal identity: DM Serif Display + Manrope, red/brass/ink
-  palette). Fonts and the logo are inlined, so this one file is all you need
-  to host the site. This is what's meant to go live on GitHub Pages.
+  palette, real photos, motion polish). Fonts, photos, and the logo are all
+  inlined, so this one file is the entire deployable site. This is what's
+  live on GitHub Pages right now.
 - **`client/`, `server/`, `drizzle/`, `shared/`, etc.** — the original
   full-stack app source (React + Vite + tRPC + Drizzle) the design was built
-  from. It includes a working contact-form backend (email via Resend), an
-  image storage proxy, and auth scaffolding, but it needs a real Node.js host
-  with environment secrets configured — **GitHub Pages cannot run it**, since
-  Pages only serves static files.
+  from. It includes a **working** contact-form backend (real email via
+  Resend), an image storage proxy, and auth scaffolding. GitHub Pages can't
+  run it — it needs a real Node.js host. See "Deploying the real app" below.
+- **`render.yaml`** — a Render Blueprint that deploys the full app as a
+  single Node web service.
 
-## Hosting `index.html` on GitHub Pages
+## Option A — what's live: `index.html` on GitHub Pages
 
-1. In this repo, go to **Settings → Pages**.
-2. Under **Build and deployment**, set **Source** to `Deploy from a branch`.
-3. Pick the `main` branch and `/ (root)` folder, then save.
-4. The site publishes at `https://<username>.github.io/nix-process-serving/`.
+Already set up. Settings → Pages → Deploy from a branch → `main` / `root`.
+The contact form on this version submits via a `mailto:` link (opens the
+visitor's email app pre-filled) since there's no server behind Pages.
 
-## Differences from the full app
+## Option B — deploy the real app (working Resend-backed form)
 
-`index.html` is a static port of the design, adapted so it needs no backend:
+The full app boots fine with **no database** — the contact form's Resend
+email route doesn't touch it, and the DB connection is lazy/optional. All
+you actually need is Node hosting + a Resend API key.
 
-- The **service request form** submits via a pre-filled `mailto:` link
-  instead of the tRPC + Resend email API (which needs a server).
-- The **hero background photo, route/map photo, and notary photo** —
-  originally stored through the app's private image-storage proxy — are
-  replaced with graphic/gradient panels in the same palette, since those
-  original images aren't available outside the app's backend. Send over the
-  actual photos and they can be dropped in.
-- All navigation, the mobile menu, scroll-reveal animations, and the sticky
-  mobile call button are reimplemented in plain JavaScript (no React/build
-  step required).
+1. **Get a Resend API key** at [resend.com](https://resend.com). For a quick
+   test before verifying your own domain, you can send from
+   `onboarding@resend.dev` — no domain setup required. For production, verify
+   `nixprocessserving.com` (or a subdomain) in Resend and send from an
+   address on it.
+2. **Deploy to [Render](https://render.com):**
+   - New → Blueprint → connect this repo. Render reads `render.yaml`
+     automatically and creates the web service.
+   - When prompted, set the two secret env vars:
+     - `RESEND_API_KEY` — from step 1
+     - `RESEND_FROM_EMAIL` — e.g. `onboarding@resend.dev` to start, or your
+       verified address later
+   - Deploy. Render builds with `pnpm` and runs `pnpm start`.
+3. **Point the domain at Render** (replaces the GitHub Pages DNS — you can't
+   run both on the same domain at once):
+   - In Render, add `nixprocessserving.com` as a custom domain on the
+     service; Render will show you the exact DNS records to use (usually a
+     CNAME, or an A record + `www` CNAME).
+   - Update those records at your registrar, replacing the GitHub Pages `A`
+     records currently there.
+4. The service now serves the same design *and* a contact form that emails
+   you for real — no visitor email client required.
+
+To go back to the static/GitHub Pages version later, just restore the DNS
+records listed in "Option A."
 
 ## Content notes
 

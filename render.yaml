@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: nix-process-serving
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && corepack prepare pnpm@10.4.1 --activate && pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+    healthCheckPath: /
