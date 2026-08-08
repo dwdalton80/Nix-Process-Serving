@@ -162,9 +162,9 @@
   .about-facts div + div { padding-left: .8rem; }
   .about-facts div:last-child { border-right: 0; }
   .about-facts strong { color: var(--nix-red); font-family: "DM Serif Display", Georgia, serif; font-size: 1.5rem; font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
-  .count-pop { display: inline-block; opacity: 0; transform: translateY(6px); transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out); }
-  .count-pop.is-counting { opacity: 1; transform: translateY(0); }
   .about-facts span { color: #5c564e; font-size: .63rem; font-weight: 700; line-height: 1.42; }
+  .about-facts strong .count-pop { display: inline-block; color: inherit; font-family: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; opacity: 0; transform: translateY(6px); transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out); }
+  .about-facts strong .count-pop.is-counting { opacity: 1; transform: translateY(0); }
   .about-casefile { align-self: start; padding: clamp(1.35rem, 2vw, 2rem); background: #211e1c; color: white; box-shadow: 15px 15px 0 rgba(180,0,24,.13); }
   .casefile-heading { display: flex; align-items: center; gap: .5rem; color: #f5ce86; font-size: .61rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
   .about-casefile h3 { margin: 1.3rem 0 .9rem; color: #fff; font-family: "DM Serif Display", Georgia, serif; font-size: 2rem; font-weight: 400; line-height: .97; letter-spacing: -.035em; }
