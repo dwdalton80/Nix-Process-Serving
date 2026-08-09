@@ -214,6 +214,7 @@
   .form-submit { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 50px; padding: .85rem 1.1rem; border: 1px solid var(--nix-red); background: var(--nix-red); color: white; font-size: .72rem; font-weight: 800; letter-spacing: .065em; text-transform: uppercase; transition: background 180ms var(--ease-out), transform 160ms var(--ease-out); cursor: pointer; width: 100%; }
   .form-submit:hover { background: var(--nix-red-deep); }
   .form-submit:active { transform: scale(.97); }
+  .form-submit:disabled { cursor: wait; opacity: .72; }
   .form-note { margin: .9rem 0 0; color: var(--nix-muted); font-size: .63rem; line-height: 1.55; }
   .form-status { display: flex; align-items: flex-start; gap: .4rem; margin: .75rem 0 0; color: #326231; font-size: .67rem; font-weight: 700; line-height: 1.45; }
   .form-status svg { flex: 0 0 auto; margin-top: .1rem; }
@@ -600,7 +601,7 @@
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           Send Service Request
         </button>
-        <p class="form-note">Submitting opens your email app with these details addressed to Nix Process Serving. Please do not include confidential information.</p>
+        <p class="form-note">Completed requests are sent securely to Nix Process Serving. Please do not include confidential information.</p>
         <p class="form-status" id="formStatus" role="status" style="display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <span id="formStatusText"></span></p>
       </form>
       <div class="contact-mark" aria-hidden="true">
@@ -771,36 +772,49 @@
     }
   }
 
-  // Service request form -> mailto (no backend on static hosting)
+  // Service request form -> Formspree (static hosting, no server of our own)
+  var FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwlevyzz';
   var form = document.getElementById('serviceForm');
   var statusEl = document.getElementById('formStatus');
   var statusText = document.getElementById('formStatusText');
+  var submitBtn = form ? form.querySelector('.form-submit') : null;
   if (form) {
     form.addEventListener('submit', function (event) {
       event.preventDefault();
       var data = new FormData(form);
       if (String(data.get('website') || '')) return; // honeypot
-      var name = String(data.get('name') || '');
-      var phone = String(data.get('phone') || '');
-      var email = String(data.get('email') || '');
+
       var service = String(data.get('service') || 'Service request');
-      var location = String(data.get('location') || '');
-      var details = String(data.get('details') || '');
-      var subject = 'Service Request — ' + service;
-      var body = [
-        'Name: ' + name,
-        'Phone: ' + phone,
-        'Email: ' + email,
-        'Requested service: ' + service,
-        'Service location: ' + (location || 'Not provided'),
-        '',
-        'Request details:',
-        details || 'Not provided',
-      ].join('\n');
-      var mailto = 'mailto:rickynix3467@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      data.set('_subject', 'Service Request — ' + service);
+
+      if (submitBtn) submitBtn.disabled = true;
       statusEl.style.display = 'flex';
-      statusText.textContent = 'Opening your email app to send this request to Nix Process Serving…';
-      window.location.href = mailto;
+      statusText.textContent = 'Sending your request…';
+
+      fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      })
+        .then(function (response) {
+          if (response.ok) {
+            statusText.textContent = 'Thank you — your request has been sent to Nix Process Serving. We’ll be in touch soon.';
+            form.reset();
+          } else {
+            return response.json().then(function (payload) {
+              var message = payload && payload.errors && payload.errors.length
+                ? payload.errors.map(function (e) { return e.message; }).join(', ')
+                : 'We could not send your request.';
+              throw new Error(message);
+            });
+          }
+        })
+        .catch(function () {
+          statusText.textContent = 'We could not send your request. Please call Nix Process Serving at 580-775-3467.';
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
   }
 
