@@ -33,7 +33,7 @@ directly to Formspree's API by JavaScript `fetch()`, shows the same inline
 `rickynix3467@gmail.com`.
 
 - Endpoint is set in `index.html`'s script as `FORMSPREE_ENDPOINT`
-  (currently `https://formspree.io/f/mwlevyzz`).
+  (currently `https://formspree.io/f/xyegkoaw`).
 - To change where submissions go, or to see submission history/spam
   filtering, log into the Formspree account that owns that form.
 - A hidden `website` field acts as a honeypot — if it's filled in (a bot
